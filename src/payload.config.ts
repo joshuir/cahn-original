@@ -22,7 +22,7 @@ import { Pages } from './collections/Pages'
 import { Users } from './collections/Users'
 import { People, Programmes, Services } from './collections/Work'
 import { DonationSettings, Homepage, SiteSettings } from './globals'
-import { LIVE_PREVIEW_BREAKPOINTS, SITE_URL } from './utilities/preview'
+import { ALLOWED_ORIGINS, LIVE_PREVIEW_BREAKPOINTS, SITE_URL } from './utilities/preview'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -108,8 +108,8 @@ export default buildConfig({
   }),
   email,
   sharp,
-  cors: [SITE_URL],
-  csrf: [SITE_URL],
+  cors: ALLOWED_ORIGINS,
+  csrf: ALLOWED_ORIGINS,
   jobs: {
     // Runs scheduled publish / unpublish jobs. On Vercel, a cron hits /api/payload-jobs/run.
     autoRun: process.env.VERCEL ? undefined : [{ cron: '* * * * *', queue: 'default' }],
