@@ -15,7 +15,7 @@
     "ci": "payload migrate && payload run src/seed/index.ts && next build"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.93.0",
