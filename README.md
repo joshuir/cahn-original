@@ -52,7 +52,7 @@ npm run payload migrate:create <name>   # after changing collections/fields
 ## Deploying (Supabase + Vercel)
 
 1. **Supabase** — create the `cms` schema and `cahn_cms` login role (see *Database isolation*), then set `DATABASE_URI` to the *Transaction pooler* connection string (port 6543) for user `cahn_cms.<project-ref>`. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` (Project settings → API) for CMS sign-in. For media, connect a Vercel Blob store (sets `BLOB_READ_WRITE_TOKEN`), or use Supabase Storage through the `S3_*` variables.
-2. **Vercel** — import this repo. Add every variable from `.env.example` in Project → Settings → Environment Variables. `vercel.json` already runs migrations before each build and sets a cron (every 5 minutes) that publishes scheduled content.
+2. **Vercel** — import this repo. Add every variable from `.env.example` in Project → Settings → Environment Variables. `vercel.json` already runs migrations before each build and sets a daily cron (06:00 UTC on the Hobby plan; change to "*/5 * * * *" on Pro) that publishes scheduled content.
 3. **First deploy** — the build runs migrations, then seeds the starter content once (it skips itself when content already exists). It also pre-creates `SEED_ADMIN_EMAIL` as an Administrator, so the CMS's open "create first user" screen is never exposed.
 4. **Email** — add a `RESEND_API_KEY` (verify the cahn.org.uk domain in Resend) or Microsoft 365 SMTP details. Set `ENQUIRIES_TO` to the inbox that should receive website enquiries.
 5. **Payments** — start with test keys.
