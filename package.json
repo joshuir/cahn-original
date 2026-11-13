@@ -1,0 +1,47 @@
+{
+  "name": "cahn-original",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Caribbean & African Health Network \u2014 website and CMS (Next.js + Payload + Supabase Postgres)",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "payload run src/seed/index.ts",
+    "ci": "payload migrate && next build"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.93.0",
+    "@payloadcms/email-nodemailer": "3.93.0",
+    "@payloadcms/email-resend": "3.93.0",
+    "@payloadcms/live-preview-react": "3.93.0",
+    "@payloadcms/next": "3.93.0",
+    "@payloadcms/plugin-form-builder": "3.93.0",
+    "@payloadcms/plugin-search": "3.93.0",
+    "@payloadcms/plugin-seo": "3.93.0",
+    "@payloadcms/richtext-lexical": "3.93.0",
+    "@payloadcms/storage-s3": "3.93.0",
+    "@payloadcms/ui": "3.93.0",
+    "graphql": "^16.11.0",
+    "gsap": "^3.15.1",
+    "next": "16.4.6",
+    "payload": "3.93.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sharp": "^0.34.0",
+    "stripe": "^23.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0"
+  }
+}
