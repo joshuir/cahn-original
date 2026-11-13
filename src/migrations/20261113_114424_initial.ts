@@ -1,7 +1,8 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`CREATE SCHEMA IF NOT EXISTS \"cms\"`)
+  // Create the schema only when missing (the production role owns an existing "cms" schema but cannot create schemas).
+  await db.execute(sql`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'cms') THEN CREATE SCHEMA "cms"; END IF; END $$;`)
   await db.execute(sql`
    CREATE TYPE "cms"."_locales" AS ENUM('en', 'fr', 'pt');
   CREATE TYPE "cms"."enum_pages_blocks_page_header_image_shape" AS ENUM('arch', 'rounded', 'door');
