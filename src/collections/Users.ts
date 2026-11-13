@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminField, isAdminUser, SECTION_OPTIONS } from '../access'
+import { supabaseStrategy } from '../auth/supabase'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -9,6 +10,8 @@ export const Users: CollectionConfig = {
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
     cookies: { secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' },
+    // Staff sign in with their existing CAHN Supabase account (see src/auth/supabase.ts).
+    strategies: [supabaseStrategy],
   },
   admin: {
     useAsTitle: 'name',

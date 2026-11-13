@@ -6,6 +6,7 @@ import { searchPlugin } from '@payloadcms/plugin-search'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -52,6 +53,11 @@ export default buildConfig({
     user: Users.slug,
     meta: { titleSuffix: ' · CAHN Studio' },
     importMap: { baseDir: path.resolve(dirname) },
+    components: {
+      graphics: { Logo: '/components/admin/Brand#Logo', Icon: '/components/admin/Brand#Icon' },
+      beforeLogin: ['/components/admin/SupabaseLogin#SupabaseLogin'],
+      logout: { Button: '/components/admin/SupabaseLogin#SupabaseLogoutButton' },
+    },
     livePreview: {
       breakpoints: LIVE_PREVIEW_BREAKPOINTS,
       collections: ['pages', 'events', 'services', 'programmes'],
@@ -93,7 +99,9 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URI || '' },
+    pool: { connectionString: process.env.DATABASE_URI || '', max: process.env.VERCEL ? 3 : 10 },
+    // All CMS tables live in their own schema, isolated from anything else in the database.
+    schemaName: process.env.DATABASE_SCHEMA || 'cms',
     // Supabase: use the pooled (6543) connection string in production.
     push: process.env.NODE_ENV !== 'production',
     migrationDir: path.resolve(dirname, 'migrations'),
@@ -163,6 +171,12 @@ export default buildConfig({
       fields: { payment: false, state: false, country: true, message: true, checkbox: true, select: true, email: true, text: true, textarea: true, number: true },
       formOverrides: { admin: { group: 'Forms' }, access: { create: canEditSection('pages'), update: canEditSection('pages') } },
       formSubmissionOverrides: { admin: { group: 'Forms' } },
+    }),
+    vercelBlobStorage({
+      enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN) && !useS3,
+      collections: { media: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN || '',
+      clientUploads: true, // large videos/PDFs upload straight to Blob, bypassing the 4.5MB function limit
     }),
     s3Storage({
       enabled: useS3,

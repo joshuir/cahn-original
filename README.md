@@ -17,6 +17,14 @@ Every visible part of the site is managed in the CMS: homepage hero, rotating ba
 | SEO: per-page meta, Organization/Event structured data, `sitemap.xml`, `robots.txt`, hreflang | `src/lib/seo.ts`, `src/app/(frontend)/sitemap.ts` |
 | GA4 (loads only after cookie consent) | CMS → *Site settings → SEO & analytics* |
 
+### Signing in to the CMS
+
+Staff sign in at `/admin` with their **existing CAHN Supabase account** (the same email and password as the CAHN Supabase admin). The site checks the password with Supabase Auth, then opens the matching CMS account by email. On first sign-in, an account is created automatically if the person's Supabase `profiles.role` grants CMS access (admin → Administrator, editor/staff → Editor, viewer → Viewer). Nothing is written to Supabase Auth. CMS-only accounts (email + password stored in the CMS) still work below the main sign-in form, as a fallback.
+
+### Database isolation
+
+All CMS tables live in their own Postgres schema (`cms`), owned by a dedicated login role (`cahn_cms`) that has no rights on the `public` schema. That lets this site share the existing `cahn-website` Supabase project without touching its tables.
+
 ### Roles
 
 * **Administrator** — everything, including users, branding and payment settings.
@@ -43,9 +51,9 @@ npm run payload migrate:create <name>   # after changing collections/fields
 
 ## Deploying (Supabase + Vercel)
 
-1. **Supabase** — create a project. Copy the *Transaction pooler* connection string (port 6543) into `DATABASE_URI`. Create a public Storage bucket called `media`, then create S3 access keys (Storage → Settings → S3 connection) and fill in the `S3_*` variables.
+1. **Supabase** — create the `cms` schema and `cahn_cms` login role (see *Database isolation*), then set `DATABASE_URI` to the *Transaction pooler* connection string (port 6543) for user `cahn_cms.<project-ref>`. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` (Project settings → API) for CMS sign-in. For media, connect a Vercel Blob store (sets `BLOB_READ_WRITE_TOKEN`), or use Supabase Storage through the `S3_*` variables.
 2. **Vercel** — import this repo. Add every variable from `.env.example` in Project → Settings → Environment Variables. `vercel.json` already runs migrations before each build and sets a cron (every 5 minutes) that publishes scheduled content.
-3. **First admin** — after the first deploy, run `npm run seed` once against the production database (locally with the production `DATABASE_URI`), or open `/admin` and create the first user.
+3. **First deploy** — the build runs migrations, then seeds the starter content once (it skips itself when content already exists). It also pre-creates `SEED_ADMIN_EMAIL` as an Administrator, so the CMS's open "create first user" screen is never exposed.
 4. **Email** — add a `RESEND_API_KEY` (verify the cahn.org.uk domain in Resend) or Microsoft 365 SMTP details. Set `ENQUIRIES_TO` to the inbox that should receive website enquiries.
 5. **Payments** — start with test keys.
    * Stripe: add `STRIPE_SECRET_KEY`; create a webhook to `https://<site>/api/webhooks/stripe` for `checkout.session.*`, `charge.refunded` and `customer.subscription.deleted`; add its signing secret as `STRIPE_WEBHOOK_SECRET`.

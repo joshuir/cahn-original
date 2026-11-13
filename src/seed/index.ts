@@ -48,7 +48,8 @@ if (!users.totalDocs) {
   const email = process.env.SEED_ADMIN_EMAIL || 'admin@cahn.org.uk'
   const password = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(12).toString('base64url')
   await payload.create({ collection: 'users', data: { email, password, name: 'CAHN Administrator', role: 'admin' }, ...ctx })
-  log(`admin created: ${email}${process.env.SEED_ADMIN_PASSWORD ? '' : ` / password: ${password}  (change it after first login)`}`)
+  const quiet = process.env.SEED_ADMIN_PASSWORD || process.env.VERCEL || process.env.CI
+  log(`admin created: ${email}${quiet ? ' — sign in with your CAHN (Supabase) account' : ` / password: ${password}  (change it after first login)`}`)
 }
 
 // ─── Site settings ──────────────────────────────────────────────────────

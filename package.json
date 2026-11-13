@@ -12,7 +12,7 @@
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
     "seed": "payload run src/seed/index.ts",
-    "ci": "payload migrate && next build"
+    "ci": "payload migrate && payload run src/seed/index.ts && next build"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -28,6 +28,7 @@
     "@payloadcms/plugin-seo": "3.93.0",
     "@payloadcms/richtext-lexical": "3.93.0",
     "@payloadcms/storage-s3": "3.93.0",
+    "@payloadcms/storage-vercel-blob": "^3.93.0",
     "@payloadcms/ui": "3.93.0",
     "graphql": "^16.11.0",
     "gsap": "^3.15.1",
